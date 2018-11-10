@@ -5,7 +5,8 @@
 
     Custom docutils writer for plain text.
 
-    :copyright: Copyright 2007-2018 by the Sphinx team, see AUTHORS.
+    :copyright: Copyright 2007-2018 by the Sphinx team,
+        2018 by Stephen Finucane <stephen@that.guru>.
     :license: BSD, see LICENSE for details.
 """
 import math
@@ -17,16 +18,9 @@ from itertools import groupby, chain
 from docutils import nodes, writers
 from docutils.utils import column_width
 
-from sphinx import addnodes
-from sphinx.locale import admonitionlabels, _
-from sphinx.util import logging
-
 if False:
     # For type annotation
     from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union  # NOQA
-    from sphinx.builders.text import TextBuilder  # NOQA
-
-logger = logging.getLogger(__name__)
 
 
 class Cell:
@@ -375,19 +369,32 @@ def my_wrap(text, width=MAXWIDTH, **kwargs):
 
 class TextWriter(writers.Writer):
     supported = ('text',)
-    settings_spec = ('No options here.', '', ())
+    settings_spec = (
+        'Text Writer Options',
+        None,
+        (
+            ('Specify the line endings used in the output file',
+             ['--eol'],
+             {
+                 'default': 'native',
+                 'dest': 'newlines',
+                 'choices': ('windows', 'linux', 'native'),
+                 'metavar': '<windows/linux/native>',
+             }),
+        ),
+    )
     settings_defaults = {}  # type: Dict
 
     output = None
 
-    def __init__(self, builder):
-        # type: (TextBuilder) -> None
+    def __init__(self):
+        # type: () -> None
         writers.Writer.__init__(self)
-        self.builder = builder
+        self.translator_class = TextTranslator
 
     def translate(self):
         # type: () -> None
-        visitor = self.builder.create_translator(self.document, self.builder)
+        visitor = self.translator_class(self.document)
         self.document.walkabout(visitor)
         self.output = visitor.body
 
@@ -395,21 +402,17 @@ class TextWriter(writers.Writer):
 class TextTranslator(nodes.NodeVisitor):
     sectionchars = '*=-~"+`'
 
-    def __init__(self, document, builder):
-        # type: (nodes.Node, TextBuilder) -> None
+    def __init__(self, document):
+        # type: (nodes.Node) -> None
         nodes.NodeVisitor.__init__(self, document)
-        self.builder = builder
 
-        newlines = builder.config.text_newlines
+        newlines = self.document.settings.newlines
         if newlines == 'windows':
             self.nl = '\r\n'
-        elif newlines == 'native':
-            self.nl = os.linesep
-        else:
+        elif newlines == 'linux':
             self.nl = '\n'
-        self.sectionchars = builder.config.text_sectionchars
-        self.add_secnumbers = builder.config.text_add_secnumbers
-        self.secnumber_suffix = builder.config.text_secnumber_suffix
+        else:
+            self.nl = os.linesep
         self.states = [[]]      # type: List[List[Tuple[int, Union[unicode, List[unicode]]]]]
         self.stateindent = [0]
         self.list_counter = []  # type: List[int]
@@ -530,17 +533,6 @@ class TextTranslator(nodes.NodeVisitor):
             raise nodes.SkipNode
         self.new_state(0)
 
-    def get_section_number_string(self, node):
-        # type: (nodes.Node) -> unicode
-        if isinstance(node.parent, nodes.section):
-            anchorname = '#' + node.parent['ids'][0]
-            numbers = self.builder.secnumbers.get(anchorname)
-            if numbers is None:
-                numbers = self.builder.secnumbers.get('')
-            if numbers is not None:
-                return '.'.join(map(str, numbers)) + self.secnumber_suffix
-        return ''
-
     def depart_title(self, node):
         # type: (nodes.Node) -> None
         if isinstance(node.parent, nodes.section):
@@ -549,8 +541,6 @@ class TextTranslator(nodes.NodeVisitor):
             char = '^'
         text = None  # type: unicode
         text = ''.join(x[1] for x in self.states.pop() if x[0] == -1)  # type: ignore
-        if self.add_secnumbers:
-            text = self.get_section_number_string(node) + text
         self.stateindent.pop()
         title = ['', text, '%s' % (char * column_width(text)), '']  # type: List[unicode]
         if len(self.states) == 2 and len(self.states[-1]) == 0:
@@ -883,8 +873,8 @@ class TextTranslator(nodes.NodeVisitor):
     def visit_image(self, node):
         # type: (nodes.Node) -> None
         if 'alt' in node.attributes:
-            self.add_text(_('[image: %s]') % node['alt'])
-        self.add_text(_('[image]'))
+            self.add_text('[image: %s]' % node['alt'])
+        self.add_text('[image]')
         raise nodes.SkipNode
 
     def visit_transition(self, node):
@@ -1052,7 +1042,7 @@ class TextTranslator(nodes.NodeVisitor):
         # type: (unicode) -> Callable[[TextTranslator, nodes.Node], None]
         def depart_admonition(self, node):
             # type: (nodes.NodeVisitor, nodes.Node) -> None
-            self.end_state(first=admonitionlabels[name] + ': ')
+            self.end_state(first=name.title() + ': ')
         return depart_admonition
 
     visit_attention = _visit_admonition
@@ -1073,8 +1063,6 @@ class TextTranslator(nodes.NodeVisitor):
     depart_tip = _make_depart_admonition('tip')
     visit_warning = _visit_admonition
     depart_warning = _make_depart_admonition('warning')
-    visit_seealso = _visit_admonition
-    depart_seealso = _make_depart_admonition('seealso')
 
     def visit_versionmodified(self, node):
         # type: (nodes.Node) -> None
@@ -1138,14 +1126,12 @@ class TextTranslator(nodes.NodeVisitor):
 
     def visit_paragraph(self, node):
         # type: (nodes.Node) -> None
-        if not isinstance(node.parent, nodes.Admonition) or \
-           isinstance(node.parent, addnodes.seealso):
+        if not isinstance(node.parent, nodes.Admonition):
             self.new_state(0)
 
     def depart_paragraph(self, node):
         # type: (nodes.Node) -> None
-        if not isinstance(node.parent, nodes.Admonition) or \
-           isinstance(node.parent, addnodes.seealso):
+        if not isinstance(node.parent, nodes.Admonition):
             self.end_state()
 
     def visit_target(self, node):
@@ -1170,10 +1156,7 @@ class TextTranslator(nodes.NodeVisitor):
 
     def visit_reference(self, node):
         # type: (nodes.Node) -> None
-        if self.add_secnumbers:
-            numbers = node.get("secnumber")
-            if numbers is not None:
-                self.add_text('.'.join(map(str, numbers)) + self.secnumber_suffix)
+        pass
 
     def depart_reference(self, node):
         # type: (nodes.Node) -> None
