@@ -381,6 +381,19 @@ class TextWriter(writers.Writer):
                  'choices': ('windows', 'linux', 'native'),
                  'metavar': '<windows/linux/native>',
              }),
+            ('Include a placeholder for images (disabled by default).',
+             ['--image'],
+             {
+                 'action': 'store_true',
+                 'dest': 'add_images',
+                 'default': False,
+             }),
+            ('Do not include image placeholders.',
+             ['--no-image'],
+             {
+                 'action': 'store_false',
+                 'dest': 'add_images',
+             }),
         ),
     )
     settings_defaults = {}  # type: Dict
@@ -413,6 +426,7 @@ class TextTranslator(nodes.NodeVisitor):
             self.nl = '\n'
         else:
             self.nl = os.linesep
+        self.add_images = self.document.settings.add_images
         self.states = [[]]      # type: List[List[Tuple[int, Union[unicode, List[unicode]]]]]
         self.stateindent = [0]
         self.list_counter = []  # type: List[int]
@@ -872,6 +886,9 @@ class TextTranslator(nodes.NodeVisitor):
 
     def visit_image(self, node):
         # type: (nodes.Node) -> None
+        if not self.add_images:
+            raise nodes.SkipNode
+
         if 'alt' in node.attributes:
             self.add_text('[image: %s]' % node['alt'])
         self.add_text('[image]')
