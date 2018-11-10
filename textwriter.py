@@ -23,6 +23,10 @@ if False:
     from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union  # NOQA
 
 
+MAXWIDTH = 70
+STDINDENT = 3
+
+
 class Cell:
     """Represents a cell in a table.
     It can span on multiple columns or on multiple lines.
@@ -44,7 +48,7 @@ class Cell:
         return hash((self.col, self.row))
 
     def wrap(self, width):
-        self.wrapped = my_wrap(self.text, width)
+        self.wrapped = TextWrapper(width=width).wrap(self.text)
 
 
 class Table:
@@ -357,16 +361,6 @@ class TextWrapper(textwrap.TextWrapper):
             cur_line.append(reversed_chunks.pop())
 
 
-MAXWIDTH = 70
-STDINDENT = 3
-
-
-def my_wrap(text, width=MAXWIDTH, **kwargs):
-    # type: (unicode, int, Any) -> List[unicode]
-    w = TextWrapper(width=width, **kwargs)
-    return w.wrap(text)
-
-
 class TextWriter(writers.Writer):
     supported = ('text',)
     settings_spec = (
@@ -456,7 +450,8 @@ class TextTranslator(nodes.NodeVisitor):
             if not toformat:
                 return
             if wrap:
-                res = my_wrap(''.join(toformat), width=MAXWIDTH - maxindent)
+                res = TextWrapper(width=MAXWIDTH - maxindent).wrap(
+                    ''.join(toformat))
             else:
                 res = ''.join(toformat).splitlines()
             if end:
