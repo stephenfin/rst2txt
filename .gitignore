@@ -1,0 +1,16 @@
+*.pyc
+*.egg
+*.eggs/
+*.egg-info/
+*.so
+*.swp
+
+.cache/
+.tox/
+.venv/
+.mypy_cache/
+.DS_Store
+
+build/
+dist/
+doc/_build/

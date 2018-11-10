@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    textwriter
-    ~~~~~~~~~~
+    rst2txt.writer
+    ~~~~~~~~~~~~~~
 
     Custom docutils writer for plain text.
 
@@ -361,7 +361,7 @@ class TextWrapper(textwrap.TextWrapper):
             cur_line.append(reversed_chunks.pop())
 
 
-class TextWriter(writers.Writer):
+class Writer(writers.Writer):
     supported = ('text',)
     settings_spec = (
         'Text Writer Options',
