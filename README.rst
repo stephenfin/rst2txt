@@ -1,5 +1,14 @@
+=======
 rst2txt
 =======
+
+.. image:: https://badge.fury.io/py/rst2txt.svg
+   :target: https://badge.fury.io/py/rst2txt
+   :alt: PyPi Status
+
+.. image:: https://travis-ci.org/stephenfin/rst2txt.svg?branch=master
+   :target: https://travis-ci.org/stephenfin/rst2txt
+   :alt: Build Status
 
 reStructuredText is pretty-damn consumable in its raw form, but extensive use
 of directives and roles can hamper things or leave the document incomplete in
