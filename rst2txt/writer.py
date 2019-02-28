@@ -23,7 +23,6 @@ if False:
     from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union  # NOQA
 
 
-MAXWIDTH = 70
 STDINDENT = 3
 
 
@@ -367,7 +366,7 @@ class Writer(writers.Writer):
         'Text Writer Options',
         None,
         (
-            ('Specify the line endings used in the output file',
+            ('The line endings used in the output file.',
              ['--eol'],
              {
                  'default': 'native',
@@ -387,6 +386,13 @@ class Writer(writers.Writer):
              {
                  'action': 'store_false',
                  'dest': 'add_images',
+             }),
+            ('The maximum line length.',
+             ['--wrap-width'],
+             {
+                 'type': int,
+                 'default': 70,
+                 'metavar': '<width>',
              }),
         ),
     )
@@ -421,6 +427,7 @@ class TextTranslator(nodes.NodeVisitor):
         else:
             self.nl = os.linesep
         self.add_images = self.document.settings.add_images
+        self.wrap_width = self.document.settings.wrap_width
         self.states = [[]]      # type: List[List[Tuple[int, Union[unicode, List[unicode]]]]]
         self.stateindent = [0]
         self.list_counter = []  # type: List[int]
@@ -450,7 +457,8 @@ class TextTranslator(nodes.NodeVisitor):
             if not toformat:
                 return
             if wrap:
-                res = TextWrapper(width=MAXWIDTH - maxindent).wrap(
+                res = TextWrapper(width=self.wrap_width - maxindent,
+                                  break_long_words=False).wrap(
                     ''.join(toformat))
             else:
                 res = ''.join(toformat).splitlines()
@@ -893,7 +901,7 @@ class TextTranslator(nodes.NodeVisitor):
         # type: (nodes.Node) -> None
         indent = sum(self.stateindent)
         self.new_state(0)
-        self.add_text('=' * (MAXWIDTH - indent))
+        self.add_text('=' * (self.wrap_width - indent))
         self.end_state()
         raise nodes.SkipNode
 

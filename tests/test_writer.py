@@ -101,6 +101,26 @@ def test_eol_linux():
     assert_serialized(source, output, settings={'newlines': 'linux'})
 
 
+def test_wrap_width():
+    source = """\
+    this is a fairly long line that I **really** want to see wrapped. Not
+    everything will be wrapped though. For example, URLs like
+    https://github.com/stephenfin/rst2txt/issues/ won't be wrapped.
+    """
+
+    output = """\
+    this is a fairly long line that
+    I **really** want to see
+    wrapped. Not everything will be
+    wrapped though. For example,
+    URLs like
+    https://github.com/stephenfin/rst2txt/issues/
+    won't be wrapped.
+    """
+
+    assert_serialized(source, output, settings={'wrap_width': 32})
+
+
 def test_admonitions():
     source = """\
     .. important:: Really important information
