@@ -7,8 +7,9 @@
 
 .cache/
 .tox/
-.venv/
+.venv*/
 .mypy_cache/
+.coverage
 .DS_Store
 
 build/
