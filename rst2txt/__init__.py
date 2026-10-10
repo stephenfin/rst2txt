@@ -13,14 +13,15 @@ locale.setlocale(locale.LC_ALL, '')  # noqa
 
 from docutils.core import default_description
 from docutils.core import publish_cmdline
-from pkg_resources import DistributionNotFound
-from pkg_resources import get_distribution
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version
 
 from rst2txt.writer import Writer
 
+
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
+    __version__ = version(__name__)
+except PackageNotFoundError:
     # package is not installed
     pass
 

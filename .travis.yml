@@ -1,12 +1,10 @@
 language: python
-sudo: false
 cache: pip
 python:
-- 2.7
-- 3.4
-- 3.5
-- 3.6
-- pypy
+- 3.10
+- 3.11
+- 3.12
+- 3.13
 install:
 - pip install tox-travis
 script:
@@ -17,7 +15,7 @@ stages:
 jobs:
   include:
   - stage: deploy
-    python: 3.6
+    python: 3.10
     install: skip  # no tests, no depedencies needed
     script: skip  # we're not running tests
     deploy:
