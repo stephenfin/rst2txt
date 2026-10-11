@@ -6,7 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "rst2txt"
 description = "Convert reStructuredText to plain text"
 readme = "README.rst"
-license = {file = "LICENSE"}
+license = "BSD-2-Clause"
+license-files = [
+    "LICENSE",
+]
 authors = [
     {name = "Stephen Finucane", email = "stephen@that.guru"},
 ]
@@ -20,11 +23,9 @@ classifiers = [
     "Intended Audience :: End Users/Desktop",
     "Intended Audience :: Science/Research",
     "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
