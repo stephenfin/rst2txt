@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
     rst2txt.__main__
     ~~~~~~~~~~~~~~~~
@@ -8,8 +7,6 @@
     :copyright: Copyright 2018, Stephen Finucane <stephen@that.guru>.
     :license: BSD, see LICENSE for details.
 """
-import locale
-locale.setlocale(locale.LC_ALL, '')  # noqa
 
 from docutils.core import default_description
 from docutils.core import publish_cmdline

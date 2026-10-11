@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
     rst2txt.writer
     ~~~~~~~~~~~~~~
