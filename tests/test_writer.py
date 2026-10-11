@@ -1,6 +1,7 @@
 """
 Test for text writer.
 """
+
 from __future__ import print_function
 
 import tempfile
@@ -17,8 +18,9 @@ def assert_serialized(source, expected_output, settings=None):
     source = textwrap.dedent(source)
     expected_output = textwrap.dedent(expected_output)
 
-    actual_output = publish_string(source=source, writer=rst2txt.Writer(),
-                                   settings_overrides=settings)
+    actual_output = publish_string(
+        source=source, writer=rst2txt.Writer(), settings_overrides=settings
+    )
 
     assert expected_output == actual_output.decode('utf-8')
 
@@ -122,24 +124,30 @@ def test_wrap_width():
     assert_serialized(source, output, settings={'wrap_width': 32})
 
 
-@pytest.mark.parametrize('word,width,expected', [
-    ('abcdef', 3, ('abc', 'def')),
-    ('abc', 1, ('a', 'bc')),
-    ('abc', 2, ('ab', 'c')),
-    ('abc', 3, ('abc', '')),
-    ('日本', 2, ('日', '本')),
-    ('日', 1, ('日', '')),
-])
+@pytest.mark.parametrize(
+    'word,width,expected',
+    [
+        ('abcdef', 3, ('abc', 'def')),
+        ('abc', 1, ('a', 'bc')),
+        ('abc', 2, ('ab', 'c')),
+        ('abc', 3, ('abc', '')),
+        ('日本', 2, ('日', '本')),
+        ('日', 1, ('日', '')),
+    ],
+)
 def test_break_word(word, width, expected):
     assert TextWrapper()._break_word(word, width) == expected
 
 
-@pytest.mark.parametrize('text,width,expected', [
-    ('abcdef', 1, ['a', 'b', 'c', 'd', 'e', 'f']),
-    ('abcdef', 3, ['abc', 'def']),
-    ('日本', 1, ['日', '本']),
-    ('日本', 2, ['日', '本']),
-])
+@pytest.mark.parametrize(
+    'text,width,expected',
+    [
+        ('abcdef', 1, ['a', 'b', 'c', 'd', 'e', 'f']),
+        ('abcdef', 3, ['abc', 'def']),
+        ('日本', 1, ['日', '本']),
+        ('日本', 2, ['日', '本']),
+    ],
+)
 def test_wrap_narrow_table_cell(text, width, expected):
     cell = Cell(text)
     cell.wrap(width)

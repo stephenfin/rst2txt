@@ -1,12 +1,12 @@
 """
-    rst2txt.writer
-    ~~~~~~~~~~~~~~
+rst2txt.writer
+~~~~~~~~~~~~~~
 
-    Custom docutils writer for plain text.
+Custom docutils writer for plain text.
 
-    :copyright: Copyright 2007-2018 by the Sphinx team,
-        2018 by Stephen Finucane <stephen@that.guru>.
-    :license: BSD, see LICENSE for details.
+:copyright: Copyright 2007-2018 by the Sphinx team,
+    2018 by Stephen Finucane <stephen@that.guru>.
+:license: BSD, see LICENSE for details.
 """
 
 from __future__ import annotations
@@ -330,7 +330,7 @@ class TextWrapper(textwrap.TextWrapper):
         The returned position 'end' satisfies::
 
             assert column_width(word[:end]) <= space_left
-            assert end == len(word) or column_width(word[:end+1]) > space_left
+            assert end == len(word) or column_width(word[: end + 1]) > space_left
         """
         total = 0
         for end, c in enumerate(word, start=1):

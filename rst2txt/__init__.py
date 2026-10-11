@@ -1,11 +1,11 @@
 """
-    rst2txt.__main__
-    ~~~~~~~~~~~~~~~~
+rst2txt.__main__
+~~~~~~~~~~~~~~~~
 
-    A minimal front end to the Docutils Publisher, producing plain text.
+A minimal front end to the Docutils Publisher, producing plain text.
 
-    :copyright: Copyright 2018, Stephen Finucane <stephen@that.guru>.
-    :license: BSD, see LICENSE for details.
+:copyright: Copyright 2018, Stephen Finucane <stephen@that.guru>.
+:license: BSD, see LICENSE for details.
 """
 
 from docutils.core import default_description
@@ -24,8 +24,9 @@ except PackageNotFoundError:
 
 
 def main():
-    description = ('Generates plain text documents from standalone '
-                   'reStructuredText sources.  ' + default_description)
+    description = (
+        'Generates plain text documents from standalone '
+        'reStructuredText sources.  ' + default_description
+    )
 
-    publish_cmdline(writer=Writer(), writer_name='txt',
-                    description=description)
+    publish_cmdline(writer=Writer(), writer_name='txt', description=description)

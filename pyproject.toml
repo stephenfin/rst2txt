@@ -81,6 +81,17 @@ check_untyped_defs = true
 warn_unused_ignores = true
 strict_optional = false
 
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.format]
+quote-style = "preserve"
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]
+
 [tool.pytest.ini_options]
 filterwarnings = [
     "ignore::DeprecationWarning:docutils.io",
