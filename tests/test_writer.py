@@ -7,9 +7,11 @@ from __future__ import print_function
 import tempfile
 import textwrap
 
+import pytest
 from docutils.core import publish_string
 
 import rst2txt
+from rst2txt.writer import Cell, TextWrapper
 
 
 def assert_serialized(source, expected_output, settings=None):
@@ -119,6 +121,50 @@ def test_wrap_width():
     """
 
     assert_serialized(source, output, settings={'wrap_width': 32})
+
+
+@pytest.mark.parametrize('word,width,expected', [
+    ('abcdef', 3, ('abc', 'def')),
+    ('abc', 1, ('a', 'bc')),
+    ('abc', 2, ('ab', 'c')),
+    ('abc', 3, ('abc', '')),
+    ('日本', 2, ('日', '本')),
+    ('日', 1, ('日', '')),
+])
+def test_break_word(word, width, expected):
+    assert TextWrapper()._break_word(word, width) == expected
+
+
+@pytest.mark.parametrize('text,width,expected', [
+    ('abcdef', 1, ['a', 'b', 'c', 'd', 'e', 'f']),
+    ('abcdef', 3, ['abc', 'def']),
+    ('日本', 1, ['日', '本']),
+    ('日本', 2, ['日', '本']),
+])
+def test_wrap_narrow_table_cell(text, width, expected):
+    cell = Cell(text)
+    cell.wrap(width)
+    assert cell.wrapped == expected
+
+
+def test_narrow_list_table():
+    source = """\
+    .. list-table::
+       :widths: 1
+
+       * - abcdef
+    """
+    output = """\
+    +---+
+    | a |
+    | b |
+    | c |
+    | d |
+    | e |
+    | f |
+    +---+
+    """
+    assert_serialized(source, output)
 
 
 def test_admonitions():

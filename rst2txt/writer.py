@@ -320,7 +320,10 @@ class TextWrapper(textwrap.TextWrapper):
         for i, c in enumerate(word):
             total += column_width(c)
             if total > space_left:
-                return word[:i - 1], word[i - 1:]
+                # Keep all characters that fit. If even the first character
+                # is wider than the line, consume it to ensure progress.
+                split_at = max(i, 1)
+                return word[:split_at], word[split_at:]
         return word, ''
 
     def _split(self, text):
